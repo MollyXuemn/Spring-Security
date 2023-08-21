@@ -42,7 +42,11 @@ public class SecurityConfig {
                         .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests()
-                    .requestMatchers("/myAccount", "/myBalance", "/myLoans", "/myCards", "/user").authenticated()
+                    .requestMatchers("/myAccount").hasRole("ADMIN")
+                    .requestMatchers("/myBalance").hasAnyRole("USER","ADMIN")
+                    .requestMatchers("/myLoans").hasRole("ADMIN")
+                    .requestMatchers("/myCards").hasRole("ADMIN")
+                    .requestMatchers( "/user").authenticated()
                     .requestMatchers( "/register", "/notices","/contact").permitAll()
                 .and().formLogin()
                 .and().httpBasic();

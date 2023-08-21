@@ -1,5 +1,6 @@
 package com.meini.easybank.config;
 
+import com.meini.easybank.model.Authority;
 import com.meini.easybank.model.Customer;
 import com.meini.easybank.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Component
 public class EsayBankUsernamePwdAuthenticationProvider implements AuthenticationProvider {
@@ -36,9 +38,7 @@ public class EsayBankUsernamePwdAuthenticationProvider implements Authentication
         List<Customer> customer = customerRepository.findByEmail(username);
         if(customer.size()>0){
             if(passwordEncoder.matches(pwd, customer.get(0).getPwd())){
-                List<GrantedAuthority> authorities = new ArrayList<>();
-                authorities.add(new SimpleGrantedAuthority(customer.get(0).getRole()));
-                return new UsernamePasswordAuthenticationToken(username,pwd,authorities);
+                return new UsernamePasswordAuthenticationToken(username,pwd,getGrantedAuthorities(customer.get(0).getAuthorities()));
             }else {
                 throw new BadCredentialsException("Invalid password!");
             }
@@ -46,6 +46,14 @@ public class EsayBankUsernamePwdAuthenticationProvider implements Authentication
             throw new BadCredentialsException("No user registered with this details!");
 
         }
+    }
+
+    private List<GrantedAuthority> getGrantedAuthorities(Set<Authority> authorities){
+        List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+        for(Authority a: authorities){
+            grantedAuthorities.add(new SimpleGrantedAuthority(a.getName()));
+        }
+        return grantedAuthorities;
     }
 
     @Override
