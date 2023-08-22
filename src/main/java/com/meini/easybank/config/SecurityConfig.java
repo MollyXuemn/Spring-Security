@@ -6,7 +6,9 @@ import com.meini.easybank.filter.JWTTokenValidatorFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 @Configuration
+@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
 
     @Bean
@@ -50,7 +53,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests()
                 .requestMatchers("/myAccount").hasRole("ADMIN")
                 .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
-                .requestMatchers("/myLoans").hasRole("ADMIN")
+                .requestMatchers("/myLoans").authenticated()
                 .requestMatchers("/myCards").hasRole("ADMIN")
                 .requestMatchers("/user").authenticated()
                 .requestMatchers("/register", "/notices", "/contact").permitAll()
